@@ -10,7 +10,7 @@ function PollHandler () {
 
 	this.getPolls = function (req, res) {
     // all polls
-    console.log('all polls ...');
+    console.log('all polls ...', req.isAuthenticated());
 		Polls
 			.find({})
       .limit(50)
@@ -45,12 +45,17 @@ function PollHandler () {
       .then(result => {
           var option = result.poll.options.id(o_id);
           if(option == undefined) {
-            res.status(400).send(`undefined option ${o_id}`);
+            res.status(400).send({
+              msg: `undefined option ${o_id}`
+            });
             return;
           }
           if(result.votes.some(v => v.user == voter)) {
             console.log('already voted', voter);
-            res.status(400).send(`${voter} already voted on ${p_id}`);
+            res.status(400).send({
+              msg: `${voter} already voted on ${p_id}`,
+              voter: voter
+            });
             return;
           }
           var vote = {

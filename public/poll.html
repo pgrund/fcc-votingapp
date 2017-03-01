@@ -1,38 +1,60 @@
 <!DOCTYPE html>
-
 <html>
-
 	<head>
 		<title>FreeCodeCamp Challenge - Voting App</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" type="text/css">
 
-		<link href="/public/css/main.css" rel="stylesheet" type="text/css">
 	</head>
 
-	<header>
-		<a class="menu" href="/">Home</a>
-    <p>|</p>
-		<a class="menu" href="/profile">Profile</a>
-		<p>|</p>
-		<a class="menu" href="/logout">Logout</a>
-	</header>
+  <header class="container">
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">
+          </a>
+        </div>
+        <ul class="nav navbar-nav">
+          <li>
+            <a href="/">Home</a>
+          </li>
+          <li>
+            <a href="/login">Login</a>
+          </li>
+          <li>
+            <a href="/profile">Profile</a>
+          </li>
+          <li>
+            <a href="/logout">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </header>
 
 	<body>
-		<div class="container">
-      <h2 id="display-name"></h2>
-      <label for="options-select">I'd like to vote for ...</label>
-      <select class="" id="options-select">
-      </select>
-
-      <svg id='piechart'></svg>
-
-
-			<div class="btn-container">
-        <button class="btn btn-vote" type="submit">submit</button>
-			</div>
+		<div class="container row">
+      <div class="col-xs-12 col-sm-offset-2 col-sm-4 row">
+        <div class="col-xs-12">
+          <h2 class="title"></h2>
+          </div>
+        <div class="col-xs-12 col-sm-offset-2 col-sm-10 row">
+          <p>I'd like to vote for ...</p>
+          <select class="col-xs-12" id="options-select">
+          </select>
+        </div>
+        <div class="col-xs-12 col-sm-offset-2 col-sm-10 row">
+          <br/>
+          <button class="btn btn-primary btn-vote col-xs-12 col-sm-12" type="submit">submit</button>
+        </div>
+      </div>
+      <div class="col-xs-12 col-sm-6" id='piechart'>
+      </div>
 		</div>
 
-		<script type="text/javascript" src="/common/ajax-functions.js"></script>
-		<script type="text/javascript" src="/controllers/pollControllerSingle.client.js"></script>
+    <script type="text/javascript" charset="utf-8" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.7.0/d3.min.js"></script>
+		<script type="text/javascript" charset="utf-8" src="/controllers/votingController.client.js"></script>
 	</body>
 
 </html>

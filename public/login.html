@@ -4,12 +4,12 @@
 
 	<head>
 		<title>Clementine.js - The elegant and lightweight full stack JavaScript boilerplate.</title>
-		
+
 		<link href="/public/css/main.css" rel="stylesheet" type="text/css">
 	</head>
 
 	<body>
-		<div class="container">	
+		<div class="container">
 			<div class="login">
 				<img src="/public/img/clementine_150.png" />
 				<br />
@@ -20,6 +20,13 @@
 						<p>LOGIN WITH GITHUB</p>
 					</div>
 				</a>
+        <form method="post" action="/auth/local">
+          <input name="username"/>
+          <input name="password" type="password" />
+          <input class="btn btn-submit" type="submit" id="login-btn">
+            LOGIN WITH LOCAL
+          </input>
+        </form>
 			</div>
 		</div>
 	</body>

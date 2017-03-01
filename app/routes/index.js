@@ -6,18 +6,13 @@ var PollHandler = require(path + '/app/controllers/pollHandler.server.js');
 module.exports = function (app, passport) {
 
 	function isLoggedIn (req, res, next) {
+    console.log('check auth', req.isAuthenticated(), req.user);
 		if (req.isAuthenticated()) {
-			return next();
+      return next();
 		} else {
       console.log('not authenticated');
-      // res.redirect('/login');
-      req.user = {
-      	 "id": "githubid",
-    	   "displayName": "name",
-    	   "username": "username",
-         "publicRepos": 0
-      };
-      return next();
+      req.session.returnTo = req.path;
+      res.redirect('/login');
 		}
 	}
 
@@ -30,6 +25,7 @@ module.exports = function (app, passport) {
 
 	app.route('/login')
 		.get(function (req, res) {
+      console.log('user at login',req.user);
 			res.sendFile(path + '/public/login.html');
 		});
 
@@ -43,6 +39,20 @@ module.exports = function (app, passport) {
 		.get(isLoggedIn, function (req, res) {
 			res.sendFile(path + '/public/profile.html');
 		});
+
+  app.route('/auth/local')
+  		.post(function(req, res, next) {
+          console.log('auth local hit', req.user, req.body.username, req.body.password);
+          next();
+        },
+        function(req, res, next) {
+          passport.authenticate('local', {
+              failureRedirect: '/login',
+              successReturnToOrRedirect : (req.session.returnTo ? req.session.returnTo : '/')
+            })(req, res, next);
+          }
+        );
+
 
 	app.route('/auth/github')
 		.get(passport.authenticate('github'));
@@ -74,6 +84,7 @@ module.exports = function (app, passport) {
       })
       .post(isLoggedIn, pollHandler.updatePoll)
       .delete(isLoggedIn, pollHandler.deletePoll);
+
   app.route('/polls/:id/options/:oid')
       .post(pollHandler.vote);
 
