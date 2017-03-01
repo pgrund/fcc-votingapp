@@ -1,7 +1,7 @@
 'use strict';
 
 var GitHubStrategy = require('passport-github').Strategy;
-var User = require('../models/users');
+var Polls = require('../models/polls');
 var configAuth = require('./auth');
 
 module.exports = function (passport) {
@@ -10,7 +10,7 @@ module.exports = function (passport) {
 	});
 
 	passport.deserializeUser(function (id, done) {
-		User.findById(id, function (err, user) {
+		Polls.findById(id, function (err, user) {
 			done(err, user);
 		});
 	});
@@ -22,7 +22,7 @@ module.exports = function (passport) {
 	},
 	function (token, refreshToken, profile, done) {
 		process.nextTick(function () {
-			User.findOne({ 'github.id': profile.id }, function (err, user) {
+			Polls.findOne({ 'github.id': profile.id }, function (err, user) {
 				if (err) {
 					return done(err);
 				}
@@ -30,20 +30,21 @@ module.exports = function (passport) {
 				if (user) {
 					return done(null, user);
 				} else {
-					var newUser = new User();
+					var newEntry = new Poll();
 
-					newUser.github.id = profile.id;
-					newUser.github.username = profile.username;
-					newUser.github.displayName = profile.displayName;
-					newUser.github.publicRepos = profile._json.public_repos;
-					newUser.nbrClicks.clicks = 0;
+					newEntry.owner.id = profile.id;
+					newEntry.owner.username = profile.username;
+					newEntry.owner.displayName = profile.displayName;
+					newEntry.owner.publicRepos = profile._json.public_repos;
+					newEntry.poll.created = Date.now();
+          newEntry.poll.options = [];
 
-					newUser.save(function (err) {
+					newEntry.save(function (err) {
 						if (err) {
 							throw err;
 						}
 
-						return done(null, newUser);
+						return done(null, newEntry);
 					});
 				}
 			});
