@@ -7,16 +7,16 @@ var configAuth = require('./auth');
 
 module.exports = function (passport) {
 
-  console.log('passport init');
-
 	passport.serializeUser(function (user, done) {
-		done(null, user.id);
+		done(null, JSON.stringify(user));
 	});
 
 	passport.deserializeUser(function (id, done) {
-		Polls.find({ 'owner.id' : id}, function (err, user) {
-			done(err, user);
-		});
+    try {
+      done(null, JSON.parse(id));
+    } catch(err) {
+      done(err, id)
+    };
 	});
 
 	passport.use(new GitHubStrategy({
@@ -34,54 +34,40 @@ module.exports = function (passport) {
 				if (user) {
 					return done(null, poll.owner);
 				} else {
-					var newEntry = new Poll();
-
-					newEntry.owner.id = profile.id;
-					newEntry.owner.username = profile.username;
-					newEntry.owner.displayName = profile.displayName;
-					newEntry.owner.publicRepos = profile._json.public_repos;
-					newEntry.poll.created = Date.now();
-          newEntry.poll.options = [];
-
-					newEntry.save(function (err) {
-						if (err) {
-							throw err;
-						}
-
-						return done(null, newEntry.owner);
-					});
+					var newEntry = {
+            id : profile.id,
+            username : profile.username,
+            displayName : profile.displayName,
+            publicRepos : profile._json.public_repos,
+            auth: 'github'
+          };
+          return done(null, newEntry);
 				}
 			});
 		});
 	 }));
   passport.use(new LocalStrategy(
     function(username, password, done) {
-        console.log('auth for local', username, password);
         if(username == password) {
           process.nextTick(function(){
             Polls.findOne({ 'owner.username': username }, function (err, poll) {
-              console.log('lookup returned ..');
-      				if (err) {
-                console.error('error', JSON.stringify(err));
-      					return done(err);
+            	if (err) {
+              	return done(err);
       				}
 
       				if (poll) {
-                console.log('user found', poll);
-      					return done(null, poll.owner);
+                return done(null, poll.owner);
       				} else {
       					var newEntry = {
                   id : `user-${(new Date()).getTime()}`,
       					  username : username,
                   displayName : `Test ${username}`,
-                  publicRepos : 0
+                  auth: 'local'
                 };
       					return done(null, newEntry);
       				}
             })
           });
-          console.log('should never hit');
-
         } else {
           console.log('username/password mismatch');
           return done(null, false);

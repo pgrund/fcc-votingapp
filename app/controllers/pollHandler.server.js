@@ -8,15 +8,26 @@ function errorHandling(err, res) {
 }
 function PollHandler () {
 
-	this.getPolls = function (req, res) {
-    // all polls
-    console.log('all polls ...', req.isAuthenticated());
-		Polls
+  this.getAllPolls = function(filterUser) {
+    if(filterUser) {
+      console.log('filter', filterUser);
+      return Polls
+  			.find({'owner.id': filterUser})
+        .limit(50)
+        .sort('-poll.created')
+        .catch(errorHandling);
+    }
+    return Polls
 			.find({})
       .limit(50)
       .sort('-poll.created')
-      .select('poll.description')
-      .catch(errorHandling)
+      .catch(errorHandling);
+  }
+
+	this.getPolls = function (req, res) {
+    // all polls
+    console.log('all polls ...');
+		this.getAllPolls()
       .then(result =>  {
         res.json(result);
 			});
@@ -79,7 +90,7 @@ function PollHandler () {
     var poll = new Polls({
       owner: req.user,
       poll: req.body,
-      voter: []
+      votes: []
     });
     poll.save()
       .catch(errorHandling)

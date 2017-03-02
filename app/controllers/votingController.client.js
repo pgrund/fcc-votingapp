@@ -72,7 +72,7 @@ $(function() {
 
     // event listeners
     voteButton.on('click', function(event) {
-      console.log('vote for ',poll._id, selectBox.val());
+      console.log('vote for ', poll._id, selectBox.val());
       $.post(`/polls/${poll._id}/options/${selectBox.val()}`)
         .done(function(data, textStatus, jqXHR) {
           console.log('sucess!');
