@@ -20,13 +20,21 @@ module.exports = function (app, passport) {
 
 	app.route('/')
 		.get(function (req, res) {
-			res.sendFile(path + '/public/index.html');
+			// res.sendFile(path + '/public/index.html');
+      var filter;
+      if(req.isAuthenticated() && req.query.filter != undefined) {
+        console.log('filtering for user', req.user);
+        filter=req.user.id;
+      }
+      pollHandler.getAllPolls(filter)
+        .then( result => {
+          res.render('home', { polls: result});
+        });
 		});
 
 	app.route('/login')
 		.get(function (req, res) {
-      console.log('user at login',req.user);
-			res.sendFile(path + '/public/login.html');
+      res.render('login');
 		});
 
 	app.route('/logout')
@@ -36,16 +44,14 @@ module.exports = function (app, passport) {
 		});
 
 	app.route('/profile')
-		.get(isLoggedIn, function (req, res) {
-			res.sendFile(path + '/public/profile.html');
-		});
+		.get(
+      isLoggedIn,
+      (req, res)  => {
+        res.render('profile');
+  		});
 
   app.route('/auth/local')
-  		.post(function(req, res, next) {
-          console.log('auth local hit', req.user, req.body.username, req.body.password);
-          next();
-        },
-        function(req, res, next) {
+      .post(function(req, res, next) {
           passport.authenticate('local', {
               failureRedirect: '/login',
               successReturnToOrRedirect : (req.session.returnTo ? req.session.returnTo : '/')
@@ -68,20 +74,7 @@ module.exports = function (app, passport) {
       .post(isLoggedIn, pollHandler.createPoll);
 
   app.route('/polls/:id')
-      .get(function (req, res) {
-        console.log(`called for ${req.params.id}`,req.accepts(['text/html', 'application/json', 'json']));
-        res.format({
-          'text/html': function() {
-            res.sendFile(path + '/public/poll.html');
-          },
-          'application/json': function() {
-            pollHandler.getSinglePoll(req, res);
-          },
-          default: function() {
-            res.sendFile(path + '/public/poll.html');
-          }
-        });
-      })
+      .get(pollHandler.getSinglePoll)
       .post(isLoggedIn, pollHandler.updatePoll)
       .delete(isLoggedIn, pollHandler.deletePoll);
 

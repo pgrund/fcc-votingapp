@@ -1,0 +1,46 @@
+<!-- views/partials/new.ejs -->
+<div id="collapsenew" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading<%=id%>">
+  <div class="panel-body container row">
+    <form class="col-xs-12 col-sm-offset-2 col-sm-4 row" method="post" action="/polls">
+       <div class="form-group">
+         <label for="newDescription">Description</label>
+         <input type="text" class="form-control" id="newDescription" name="description" placeholder="Description">
+       </div>
+       <div class="form-group">
+         <label for="newOptions">Available Options</label>
+         <input type="text" class="form-control" id="newOptions" name="options" placeholder="Multiple Options, seperated by coma ...">
+       </div>
+       <button type="submit" class="btn btn-new btn-default">Submit</button>
+  </form>
+</div>
+</div>
+<script>
+  $('#collapsenew form').submit(function(event) {
+
+    var poll ={};
+    var arr = $(this).serializeArray() // serialize form to object
+      .forEach( o => { poll[o.name] =  o.value});
+
+    poll.options = poll.options.split(',') // split up
+        .map(o => o.trim()) // remove leading and trailing spaces
+        .filter(o => o.length > 0) // only no null values
+        .map(o => { return {   // map to right options object
+            key: o.replace(/[\s\.-]/g,'_'), // handle special chars
+            name: o
+          };
+        });
+    console.log('before',poll);
+    //Submit the form via Ajax POST request:
+     $.ajax({
+       type: 'POST',
+       url:  '/polls',
+       data:  poll,
+       dataType: 'json'
+     }).done(function(data) {
+       console.log("Response Data", data); //Log the server response to console
+      window.location.reload();
+     });
+     //alert("Does this alert appear first or second?");
+     return false;
+  });
+</script>

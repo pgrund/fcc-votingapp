@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>FreeCodeCamp Challenge - Voting App</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+	</head>
+	<body>
+    <%- include('partials/navbar') %>
+
+		<div class="container">
+      <div class="row">
+         <div class="col-xs-offset-3 col-xs-6 row">
+           <div class="col-xs-12 col-sm-2">
+             <i class="fa fa-3x fa-<%=(user.auth == 'github' ? 'github' : 'user-circle')%>"></i>
+             <%= user.auth%>
+           </div>
+           <div class="col-xs-12 col-sm-10">
+    				<p><span>ID: </span><span id="profile-id" class="profile-value"><%= user.id %></span></p>
+    				<p><span>Username: </span><span id="profile-username" class="profile-value"><%= user.username %></span></p>
+    				<p><span>Display Name: </span><span id="display-name" class="profile-value"><%= user.displayName %></span></p>
+    				<p><span>Repositories: </span><span id="profile-repos" class="profile-value"><%= user.publicRepos %></span></p>
+            <pre><%- JSON.stringify(user, null, ' ')%></pre>
+          </div>
+        </div>
+			</div>
+		</div>
+	</body>
+
+</html>
