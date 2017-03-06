@@ -50,7 +50,7 @@ class PollDetails extends React.Component {
               </Row>
             </Col>
             <Col xs={12} sm={6}>
-              <PieChart />
+              <PieChart votes={poll.votes}/>
             </Col>
           </Row>
         </Grid>

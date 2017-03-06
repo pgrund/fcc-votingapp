@@ -51,9 +51,11 @@ class PollList extends React.Component {
           {buttons}
           </Jumbotron>
         <Accordion>
+        { authenticated &&
           <Panel header={newHeading} bsStyle="success" eventKey="newPoll" key='newPoll'>
             <PollNew />
           </Panel>
+        }
           { items.map( item =>
           <Panel header={item.poll.description} eventKey={'poll' +item._id} key={'poll' +item._id}>
             <PollDetails poll={item.poll} votes={item.votes} id={item._id} editable={authenticated && item.owner.id == user.id} user={user}/>
