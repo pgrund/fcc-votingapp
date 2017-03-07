@@ -9,9 +9,6 @@ class PieChart extends React.Component {
     var { width, height } = this.props;
     var radius = Math.min(width, height) / 2;
 
-    console.log(el, this.props);
-
-
     var svg = d3.select(el).append("svg")
       .attr('width', width)
       .attr('height', height);
@@ -20,7 +17,7 @@ class PieChart extends React.Component {
 
     svg.select('.chartLayer').remove();
 
-    var data = d3.nest().key(d => d.option).entries(votes);
+    var data = d3.nest().key(d => d.name).entries(votes);
 
     var chartLayer = svg.append("g").classed("chartLayer", true)
     var color = d3.scaleOrdinal(d3.schemeCategory10);
@@ -54,16 +51,22 @@ class PieChart extends React.Component {
          .attr("id", function(d, i) { return "arc-" + i })
          .attr("stroke", "gray")
          .attr("fill", function(d,i){ return color(i); })
+     newBlock.append("text")
+         .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
+         .attr("dy", ".35em")
+         .text(function(d) {return d.data.key;});
   }
 
   componentWillUnmount() {
       var el = ReactDOM.findDOMNode(this);
-      $(el).find('.chartLayer').remove();
+      d3.select(el).select('.chartLayer').remove();
   }
 
   render() {
     return (
-      <div id="piechart"></div>
+      <div id="piechart">
+      { this.props.votes.length == 0 && <p className="lead">no votes yet</p>}
+      </div>
     );
   }
 }

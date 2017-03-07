@@ -4,13 +4,16 @@ import {Grid, Row, Col, Button, ButtonGroup} from 'react-bootstrap';
 
 class PollDetails extends React.Component {
   render() {
-    var {editable, poll, user} = this.props;
+    var {editable, poll, votes, user, onDelete, onEdit, onVote, id} = this.props;
 
-    var alreadyVoted = poll.votes.find(v => v.user == user.name);
+    var alreadyVoted = (votes && votes.find(v => v.user == user.username));
 
     function optionButton(o, idx) {
-      console.log(o, idx, alreadyVoted);
-      var btn = <Button bsStyle='primary'>{o.name}</Button>;
+      var option = votes.filter(v => v.option == o._id);
+      if(o.name=='e') {
+        console.log('option testing', o, option, user);
+      }
+      var btn = <Button bsStyle='primary' onClick={() => {onVote(o._id)}}>{o.name}</Button>;
       if(alreadyVoted) {
         btn = <Button bsStyle='default' disabled className={alreadyVoted.option == o._id  ? ' focus' : ''}>{o.name}</Button>;
       }
@@ -20,7 +23,6 @@ class PollDetails extends React.Component {
         </Col>
       );
     }
-
     return (
         <Grid>
           <Row>
@@ -29,8 +31,8 @@ class PollDetails extends React.Component {
                 <Col xs={12}>
                   { editable &&
                   <ButtonGroup className="pull-right">
-                    <Button bsStyle="danger"><i className="fa fa-trash"></i>delete</Button>
-                    <Button bsStyle="warning"><i className="fa fa-pencil"></i>edit</Button>
+                    <Button bsStyle="danger" onClick={() => { onDelete(id)}}><i className="fa fa-trash"></i>delete</Button>
+                    <Button bsStyle="warning" onClick={() => { onEdit(id)}}><i className="fa fa-pencil"></i>edit</Button>
                   </ButtonGroup>
                   }
                   <h2 className="title">{poll.description}</h2>
@@ -50,7 +52,9 @@ class PollDetails extends React.Component {
               </Row>
             </Col>
             <Col xs={12} sm={6}>
-              <PieChart votes={poll.votes}/>
+              <PieChart votes={votes.map(v => {
+                 v.name = poll.options.find(o => o._id == v.option).name;
+                 return v})}/>
             </Col>
           </Row>
         </Grid>
@@ -60,10 +64,16 @@ class PollDetails extends React.Component {
 PollDetails.propTypes = {
   editable: React.PropTypes.bool.isRequired,
   poll : React.PropTypes.object.isRequired,
-  user: React.PropTypes.object.isRequired
+  user: React.PropTypes.object.isRequired,
+  onDelete: React.PropTypes.func.isRequired,
+  onEdit: React.PropTypes.func.isRequired,
+  onVote: React.PropTypes.func.isRequired
 };
 PollDetails.defaultProps = {
-  editable: false
+  editable: false,
+  onDelete: function(id) {console.log('no function defined for deleting a poll!!', id);},
+  onEdit: function(id) {console.log('no function defined for editing a poll!!', id);},
+  onVote: function(id) {console.log('no function defined for voting for an option!!', id);}
 };
 
 export default PollDetails;

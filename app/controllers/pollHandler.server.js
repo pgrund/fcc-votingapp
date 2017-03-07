@@ -27,7 +27,11 @@ function PollHandler () {
 	this.getPolls = function (req, res) {
     // all polls
     console.log('all polls ...');
-		this.getAllPolls()
+    Polls
+			.find({})
+      .limit(50)
+      .sort('-poll.created')
+      .catch(errorHandling)
       .then(result =>  {
         res.json(result);
 			});
@@ -48,7 +52,7 @@ function PollHandler () {
 	this.vote = function (req, res) {
     var p_id = req.params.id,
         o_id = req.params.oid;
-    var voter = req.user ? req.user.username : req.ip;
+    var voter = req.user ? req.user.username : `user-${unescape(encodeURIComponent(req.ip))}`;
     console.log('vote', voter, p_id, o_id);
 		Polls
 			.findById(p_id)
@@ -86,7 +90,7 @@ function PollHandler () {
 	};
 
 	this.createPoll = function (req, res) {
-		console.log('create a new poll', req.body);
+		console.log('create a new poll', req.body, req.user);
     var poll = new Polls({
       owner: req.user,
       poll: req.body,
@@ -102,7 +106,7 @@ function PollHandler () {
 
   this.updatePoll = function (req, res) {
     var p_id = req.params.id;
-    console.log('update poll', req.body);
+    console.log('update poll', req.body, req.user);
     Polls.findOneAndUpdate({_id: p_id }, { poll: req.body})
       .catch(errorHandling)
       .then( result => {
@@ -113,7 +117,7 @@ function PollHandler () {
 
   this.deletePoll = function (req, res) {
     var p_id = req.params.id;
-    console.log('delete poll', p_id);
+    console.log('delete poll', p_id, req.user);
     Polls.remove({_id: p_id })
       .catch(errorHandling)
       .then( result => {

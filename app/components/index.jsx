@@ -1,7 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {Grid, Row, Col} from 'react-bootstrap';
 import MyNav from './MyNav.jsx';
 import PollList from './PollList.jsx';
+import LoginForm from './LoginForm.jsx';
+import ProfileForm from './ProfileForm.jsx';
 
 class VoteApp extends React.Component {
 
@@ -9,21 +12,48 @@ class VoteApp extends React.Component {
     super(props);
     this.state = {
       authenticated: false,
-      user: {}
+      user: {},
+      errors: {},
+      show: {
+        login: false,
+        profile: false
+      }
     };
     this.loginHandler = this.loginHandler.bind(this);
     this.logoutHandler = this.logoutHandler.bind(this);
+    this.setAnonymousUser = this.setAnonymousUser.bind(this);
   }
 
-  loginHandler() {
-    this.setState({
-      authenticated: true,
-      user: {
-        id: 'a',
-        name: 'user-a'
-      }
-    });
-    console.log('logged in');
+  setAnonymousUser(user) {
+    if(!this.state.authenticated) {
+      console.log('setting anonymous user', user);
+      this.setState({user: user});
+    }
+  }
+  loginHandler( user ) {
+    const _this = this;
+    const login = Object.keys(user).map((key) => {
+      return encodeURIComponent(key) + '=' + encodeURIComponent(user[key]);
+    }).join('&');
+    fetch(`/auth/local`, {
+          method: 'POST',
+          headers: {
+             'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
+          },
+          credentials: 'same-origin',
+          body: login
+      }).then(function(response) {
+        return response.json();
+      }).then(function(loggedInUser){
+        console.log('auth successfull', loggedInUser);
+        _this.setState({
+          authenticated: true,
+          user: loggedInUser,
+          show: {
+            login: false
+          }
+        });
+      })
   }
 
   logoutHandler(){
@@ -34,14 +64,24 @@ class VoteApp extends React.Component {
     console.log('logged out');
   }
 
+
   render() {
-    var {authenticated,user} = this.state;
+    var {authenticated, user, errors} = this.state;
     return (
-      <div className="container-fluid">
+      <Grid fluid>
         <MyNav authenticated={authenticated} user={user}
-          onLogin={this.loginHandler} onLogout={this.logoutHandler}/>
-        <PollList authenticated={authenticated} user={user}/>
-      </div>
+          onLogin={() => {this.setState({show : {login: true}});}}
+          onProfile={() => {this.setState({show : {profile: true}});}}
+          onLogout={this.logoutHandler}/>
+        <PollList authenticated={authenticated} user={user}
+          handleAnonymousUser={this.setAnonymousUser}/>
+        <LoginForm user={user} errors={errors}
+          handleClose={() => {this.setState({show : {login: false}});}}
+          visible={this.state.show.login}
+          handleAuthByLocal={this.loginHandler}/>
+        {authenticated && <ProfileForm user={user} visible={this.state.show.profile}
+          handleClose={() => {this.setState({show: {profile: false}})}}/> }
+      </Grid>
     );
   }
 }

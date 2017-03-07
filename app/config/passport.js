@@ -8,14 +8,15 @@ var configAuth = require('./auth');
 module.exports = function (passport) {
 
 	passport.serializeUser(function (user, done) {
-		done(null, JSON.stringify(user));
+    var sessionUser = {id: user.id, username: user.username, displayName: user.displayName, auth: user.auth}
+		done(null, sessionUser);
 	});
 
-	passport.deserializeUser(function (id, done) {
+	passport.deserializeUser(function (sessionUser, done) {
     try {
-      done(null, JSON.parse(id));
+      done(null, sessionUser);
     } catch(err) {
-      done(err, id)
+      done(err, sessionUser)
     };
 	});
 
@@ -59,7 +60,7 @@ module.exports = function (passport) {
                 return done(null, poll.owner);
       				} else {
       					var newEntry = {
-                  id : `user-${(new Date()).getTime()}`,
+                  id : `user-${username.split('').map((s) => s.charCodeAt(0)).join('')}`,
       					  username : username,
                   displayName : `Test ${username}`,
                   auth: 'local'

@@ -12,7 +12,7 @@ module.exports = function (app, passport) {
 		} else {
       console.log('not authenticated');
       req.session.returnTo = req.path;
-      res.redirect('/login');
+      res.redirect(302, '/login');
 		}
 	}
 
@@ -20,44 +20,36 @@ module.exports = function (app, passport) {
 
 	app.route('/')
 		.get(function (req, res) {
-			// res.sendFile(path + '/public/index.html');
-      var filter;
-      if(req.isAuthenticated() && req.query.filter != undefined) {
-        console.log('filtering for user', req.user);
-        filter=req.user.id;
-      }
-      pollHandler.getAllPolls(filter)
-        .then( result => {
-          res.render('home', { polls: result});
-        });
+			 res.sendFile(path + '/app/public/index.html');
 		});
 
 	app.route('/login')
 		.get(function (req, res) {
-      res.render('login');
+      res.sendFile(path + '/public/login.html');
 		});
 
 	app.route('/logout')
 		.get(function (req, res) {
+      console.log('logged out');
 			req.logout();
+      req.session.destroy();
 			res.redirect('/');
 		});
 
 	app.route('/profile')
-		.get(
-      isLoggedIn,
-      (req, res)  => {
+		.get(isLoggedIn,(req, res)  => {
         res.render('profile');
   		});
 
   app.route('/auth/local')
-      .post(function(req, res, next) {
-          passport.authenticate('local', {
-              failureRedirect: '/login',
-              successReturnToOrRedirect : (req.session.returnTo ? req.session.returnTo : '/')
-            })(req, res, next);
-          }
-        );
+      .post(passport.authenticate('local', {
+               failureRedirect: '/login',
+              //  successReturnToOrRedirect : (req.session.returnTo ? req.session.returnTo : '/')
+            }
+            ), function(req, res, next) {
+              req.session.user = req.user;
+              res.json(req.user);
+          });
 
 
 	app.route('/auth/github')
@@ -70,7 +62,16 @@ module.exports = function (app, passport) {
 		}));
 
 	app.route('/polls')
-      .get(pollHandler.getPolls)
+      .get(function(req, res){
+        pollHandler.getAllPolls().then( function(result) {
+            var user = req.user ? req.user : {
+              id: req.ip.replace(/\.|\s|:|\\|\//g, '_'),
+              username: `user-${req.ip}`,
+              displayName: `anonymous from ${req.ip}`
+            };
+            res.json({ polls: result, user: user});
+          });
+        })
       .post(isLoggedIn, pollHandler.createPoll);
 
   app.route('/polls/:id')
@@ -79,6 +80,9 @@ module.exports = function (app, passport) {
       .delete(isLoggedIn, pollHandler.deletePoll);
 
   app.route('/polls/:id/options/:oid')
-      .post(pollHandler.vote);
+      .post(function(req,res,next) {
+          console.log('voting', req.user);
+          next();
+        },pollHandler.vote);
 
 };

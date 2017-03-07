@@ -1,10 +1,7 @@
 import React from 'react';
 import {Navbar, Nav, NavItem} from 'react-bootstrap';
 
-class MyNav extends React.Component {
-
-  render() {
-    return (
+const MyNav = ({ authenticated, onProfile, onLogin, onLogout }) => (
         <Navbar>
           <Navbar.Header>
             <Navbar.Brand>
@@ -15,27 +12,26 @@ class MyNav extends React.Component {
           <Navbar.Collapse>
             <Nav>
               <NavItem eventKey='nav1' href="#">Home</NavItem>
-              { this.props.authenticated && <NavItem eventKey='nav3' href="#" onClick={() => alert(JSON.stringify(this.props.user, null, ' '))}>Profile</NavItem> }
+              { authenticated && <NavItem eventKey='nav3' href="#" onClick={onProfile}>Profile</NavItem> }
             </Nav>
             <Nav pullRight>
-              { !this.props.authenticated && <NavItem eventKey='nav2' href="#" onClick={this.props.onLogin}>Login</NavItem> }
-              { this.props.authenticated && <NavItem eventKey='nav4' href="#" onClick={this.props.onLogout}>Logout</NavItem> }
+              { authenticated ? <NavItem eventKey='nav4' href="/logout" onClick={onLogout}>Logout</NavItem> : <NavItem eventKey='nav2' href="#" onClick={onLogin}>Login</NavItem> }
             </Nav>
           </Navbar.Collapse>
         </Navbar>
     );
-  }
-}
+
 MyNav.propTypes = {
   authenticated: React.PropTypes.bool.isRequired,
-  user: React.PropTypes.object,
   onLogin: React.PropTypes.func.isRequired,
-  onLogout: React.PropTypes.func.isRequired
+  onLogout: React.PropTypes.func.isRequired,
+  onProfile: React.PropTypes.func.isRequired
 };
 MyNav.defaultProps = {
   authenticated: false,
   onLogin: function() {console.warn('no login function defined !!')},
-  onLogout: function() {console.warn('no login function defined !!')}
+  onLogout: function() {console.warn('no login function defined !!')},
+  onProfile: function() {console.warn('no function defined to show profile !!');}
 };
 
 export default MyNav;
