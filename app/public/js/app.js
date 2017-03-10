@@ -140,7 +140,7 @@ var MyNav = function MyNav(_ref) {
       onProfile = _ref.onProfile,
       onLogin = _ref.onLogin,
       onLogout = _ref.onLogout;
-  return _react2.default.createElement(_reactBootstrap.Navbar, null, _react2.default.createElement(_reactBootstrap.Navbar.Header, null, _react2.default.createElement(_reactBootstrap.Navbar.Brand, null, _react2.default.createElement('a', { href: '#' }, 'FreeCodeCamp - Voting App')), _react2.default.createElement(_reactBootstrap.Navbar.Toggle, null)), _react2.default.createElement(_reactBootstrap.Navbar.Collapse, null, _react2.default.createElement(_reactBootstrap.Nav, null, _react2.default.createElement(_reactBootstrap.NavItem, { eventKey: 'nav1', href: '#' }, 'Home'), authenticated && _react2.default.createElement(_reactBootstrap.NavItem, { eventKey: 'nav3', href: '#', onClick: onProfile }, 'Profile')), _react2.default.createElement(_reactBootstrap.Nav, { pullRight: true }, authenticated ? _react2.default.createElement(_reactBootstrap.NavItem, { eventKey: 'nav4', href: '/logout', onClick: onLogout }, 'Logout') : _react2.default.createElement(_reactBootstrap.NavItem, { eventKey: 'nav2', href: '#', onClick: onLogin }, 'Login'))));
+  return _react2.default.createElement(_reactBootstrap.Navbar, null, _react2.default.createElement(_reactBootstrap.Navbar.Header, null, _react2.default.createElement(_reactBootstrap.Navbar.Brand, null, _react2.default.createElement('a', { href: '#' }, 'FCC-Voting App')), _react2.default.createElement(_reactBootstrap.Navbar.Toggle, null)), _react2.default.createElement(_reactBootstrap.Navbar.Collapse, null, _react2.default.createElement(_reactBootstrap.Nav, null, _react2.default.createElement(_reactBootstrap.NavItem, { eventKey: 'nav1', href: '#' }, 'Home'), authenticated && _react2.default.createElement(_reactBootstrap.NavItem, { eventKey: 'nav3', href: '#', onClick: onProfile }, 'Profile')), _react2.default.createElement(_reactBootstrap.Nav, { pullRight: true }, authenticated ? _react2.default.createElement(_reactBootstrap.NavItem, { eventKey: 'nav4', href: '/logout', onClick: onLogout }, 'Logout') : _react2.default.createElement(_reactBootstrap.NavItem, { eventKey: 'nav2', href: '#', onClick: onLogin }, 'Login'))));
 };
 
 MyNav.propTypes = {
@@ -188,6 +188,8 @@ var _react2 = _interopRequireDefault(_react);
 var _reactDom = require('react-dom');
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
+
+var _reactBootstrap = require('react-bootstrap');
 
 var _d = require('d3');
 
@@ -251,6 +253,7 @@ var PieChart = function (_React$Component) {
       var votes = this.props.votes;
 
       svg.select('.chartLayer').remove();
+      svg.select('.tableData').remove();
 
       var data = d3.nest().key(function (d) {
         return d.name;
@@ -287,11 +290,22 @@ var PieChart = function (_React$Component) {
     value: function componentWillUnmount() {
       var el = _reactDom2.default.findDOMNode(this);
       d3.select(el).select('.chartLayer').remove();
+      d3.select(el).select('.tableData').remove();
     }
   }, {
     key: 'render',
     value: function render() {
-      return _react2.default.createElement('div', { id: 'piechart' }, this.props.votes.length == 0 && _react2.default.createElement('p', { className: 'lead' }, 'no votes yet'));
+      var _props2 = this.props,
+          votes = _props2.votes,
+          showTable = _props2.showTable;
+
+      var data = d3.nest().key(function (d) {
+        return d.name;
+      }).entries(votes);
+      var table = _react2.default.createElement(_reactBootstrap.Table, { bordered: true, hover: true, striped: true }, _react2.default.createElement('caption', { className: 'h2' }, 'Votes for this poll'), _react2.default.createElement('tbody', null, data.map(function (d) {
+        return _react2.default.createElement('tr', { key: d.key }, _react2.default.createElement('th', null, d.key), _react2.default.createElement('td', null, d.values.length));
+      })));
+      return _react2.default.createElement('div', { id: 'piechart' }, votes.length == 0 && _react2.default.createElement('p', { className: 'lead' }, 'no votes yet'), showTable && table);
     }
   }]);
 
@@ -301,17 +315,19 @@ var PieChart = function (_React$Component) {
 PieChart.propTypes = {
   width: _react2.default.PropTypes.number.isRequired,
   height: _react2.default.PropTypes.number.isRequired,
-  votes: _react2.default.PropTypes.array.isRequired
+  votes: _react2.default.PropTypes.array.isRequired,
+  showTable: _react2.default.PropTypes.bool
 };
 PieChart.defaultProps = {
   width: 480,
   height: 300,
-  votes: []
+  votes: [],
+  showTable: false
 };
 
 exports.default = PieChart;
 
-},{"d3":110,"react":449,"react-dom":253}],4:[function(require,module,exports){
+},{"d3":110,"react":449,"react-bootstrap":242,"react-dom":253}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -363,28 +379,37 @@ function _inherits(subClass, superClass) {
 var PollDetails = function (_React$Component) {
   _inherits(PollDetails, _React$Component);
 
-  function PollDetails() {
+  function PollDetails(props) {
     _classCallCheck(this, PollDetails);
 
-    return _possibleConstructorReturn(this, (PollDetails.__proto__ || Object.getPrototypeOf(PollDetails)).apply(this, arguments));
+    var _this = _possibleConstructorReturn(this, (PollDetails.__proto__ || Object.getPrototypeOf(PollDetails)).call(this, props));
+
+    _this.state = {
+      option: {}
+    };
+    return _this;
   }
 
   _createClass(PollDetails, [{
     key: 'render',
     value: function render() {
+      var _this2 = this;
+
       var _props = this.props,
-          editable = _props.editable,
+          owner = _props.owner,
           poll = _props.poll,
           votes = _props.votes,
           user = _props.user,
+          id = _props.id,
+          authenticated = _props.authenticated,
           onDelete = _props.onDelete,
           onEdit = _props.onEdit,
-          onVote = _props.onVote,
-          id = _props.id;
+          onVote = _props.onVote;
 
       var alreadyVoted = votes && votes.find(function (v) {
         return v.user == user.username;
       });
+      var editable = owner && owner.id == user.id;
 
       function optionButton(o, idx) {
         var option = votes.filter(function (v) {
@@ -399,18 +424,25 @@ var PollDetails = function (_React$Component) {
         if (alreadyVoted) {
           btn = _react2.default.createElement(_reactBootstrap.Button, { bsStyle: 'default', disabled: true, className: alreadyVoted.option == o._id ? ' focus' : '' }, o.name);
         }
-        return _react2.default.createElement(_reactBootstrap.Col, { key: o._id, xs: 12, sm: 4, className: 'btn-option' }, btn);
+        return _react2.default.createElement(_reactBootstrap.Col, { key: o._id, xs: 12, className: 'btn-option' }, btn);
       }
-      return _react2.default.createElement(_reactBootstrap.Grid, null, _react2.default.createElement(_reactBootstrap.Row, null, _react2.default.createElement(_reactBootstrap.Col, { xs: 12, smOffset: 1, sm: 5 }, _react2.default.createElement(_reactBootstrap.Row, null, _react2.default.createElement(_reactBootstrap.Col, { xs: 12 }, editable && _react2.default.createElement(_reactBootstrap.ButtonGroup, { className: 'pull-right' }, _react2.default.createElement(_reactBootstrap.Button, { bsStyle: 'danger', onClick: function onClick() {
+      return _react2.default.createElement(_reactBootstrap.Grid, null, _react2.default.createElement(_reactBootstrap.Row, null, _react2.default.createElement(_reactBootstrap.Col, { xs: 12, smOffset: 1, sm: 5 }, _react2.default.createElement(_reactBootstrap.Row, null, _react2.default.createElement(_reactBootstrap.Col, { xs: 12 }, _react2.default.createElement(_reactBootstrap.ButtonToolbar, null, editable && _react2.default.createElement(_reactBootstrap.ButtonGroup, { className: 'pull-right' }, _react2.default.createElement(_reactBootstrap.Button, { bsStyle: 'danger', onClick: function onClick() {
           onDelete(id);
-        } }, _react2.default.createElement('i', { className: 'fa fa-trash' }), 'delete'), _react2.default.createElement(_reactBootstrap.Button, { bsStyle: 'warning', onClick: function onClick() {
+        } }, _react2.default.createElement('i', { className: 'fa fa-trash' }), ' delete'), _react2.default.createElement(_reactBootstrap.Button, { bsStyle: 'warning', onClick: function onClick() {
           onEdit(id);
-        } }, _react2.default.createElement('i', { className: 'fa fa-pencil' }), 'edit')), _react2.default.createElement('h2', { className: 'title' }, poll.description)), _react2.default.createElement(_reactBootstrap.Col, { xs: 12, smOffset: 2, sm: 10 }, _react2.default.createElement(_reactBootstrap.Row, null, _react2.default.createElement(_reactBootstrap.Col, { xs: 12 }, _react2.default.createElement('p', null, alreadyVoted ? 'I voted for ...' : 'I\'d like to vote for ...')), _react2.default.createElement(_reactBootstrap.Col, { xs: 12 }, _react2.default.createElement(_reactBootstrap.Row, null, poll.options.map(optionButton))))))), _react2.default.createElement(_reactBootstrap.Col, { xs: 12, sm: 6 }, _react2.default.createElement(_PieChart2.default, { votes: votes.map(function (v) {
+        } }, _react2.default.createElement('i', { className: 'fa fa-pencil' }), ' edit')), authenticated && _react2.default.createElement(_reactBootstrap.ButtonGroup, { className: 'pull-right' }, _react2.default.createElement(_reactBootstrap.Button, { bsStyle: 'primary', onClick: function onClick() {
+          console.log('share', '/polls/' + id);
+        } }, _react2.default.createElement('i', { className: 'fa fa-mail' }), ' share poll'))), _react2.default.createElement('h2', { className: 'title' }, poll.description)), _react2.default.createElement(_reactBootstrap.Col, { xs: 12, smOffset: 2, sm: 10 }, _react2.default.createElement(_reactBootstrap.Row, null, _react2.default.createElement(_reactBootstrap.Col, { xs: 12 }, _react2.default.createElement('p', null, alreadyVoted ? 'I voted for ...' : 'I\'d like to vote for ...'), authenticated && _react2.default.createElement(_reactBootstrap.FormGroup, { className: 'pull-right' }, _react2.default.createElement(_reactBootstrap.InputGroup, null, _react2.default.createElement(_reactBootstrap.FormControl, { type: 'text', onChange: function onChange(evt) {
+          _this2.setState({ option: evt.target.value });
+        } }), _react2.default.createElement(_reactBootstrap.InputGroup.Button, null, _react2.default.createElement(_reactBootstrap.Button, { bsStyle: 'success', onClick: function onClick() {
+          alert(_this2.state.option);
+        } }, 'add option'))))), _react2.default.createElement(_reactBootstrap.Col, { xs: 12 }, _react2.default.createElement(_reactBootstrap.Row, null, poll.options.map(optionButton))))))), _react2.default.createElement(_reactBootstrap.Col, { xs: 12, sm: 6 }, _react2.default.createElement(_PieChart2.default, { votes: votes.map(function (v) {
           v.name = poll.options.find(function (o) {
             return o._id == v.option;
           }).name;
           return v;
-        }) }))));
+        }),
+        showTable: authenticated && editable }))));
     }
   }]);
 
@@ -418,7 +450,8 @@ var PollDetails = function (_React$Component) {
 }(_react2.default.Component);
 
 PollDetails.propTypes = {
-  editable: _react2.default.PropTypes.bool.isRequired,
+  authenticated: _react2.default.PropTypes.bool.isRequired,
+  owner: _react2.default.PropTypes.object.isRequired,
   poll: _react2.default.PropTypes.object.isRequired,
   user: _react2.default.PropTypes.object.isRequired,
   onDelete: _react2.default.PropTypes.func.isRequired,
@@ -426,7 +459,7 @@ PollDetails.propTypes = {
   onVote: _react2.default.PropTypes.func.isRequired
 };
 PollDetails.defaultProps = {
-  editable: false,
+  authenticated: false,
   onDelete: function onDelete(id) {
     console.log('no function defined for deleting a poll!!', id);
   },
@@ -676,19 +709,20 @@ var PollList = function (_React$Component) {
       var newHeading = _react2.default.createElement('h2', null, _react2.default.createElement('i', { className: 'fa fa-plus-circle' }), ' NEW');
       var buttons;
       if (authenticated) {
-        buttons = _react2.default.createElement(_reactBootstrap.ButtonToolbar, null, _react2.default.createElement(_reactBootstrap.Button, { bsSize: 'small', bsStyle: 'primary', disabled: true, onClick: this.filterOn }, 'only my polls'), _react2.default.createElement(_reactBootstrap.Button, { bsSize: 'small', bsStyle: 'success', onClick: this.filterOff }, 'all polls'));
+        buttons = _react2.default.createElement(_reactBootstrap.ButtonToolbar, { className: 'pull-right' }, _react2.default.createElement(_reactBootstrap.Button, { bsSize: 'small', bsStyle: 'primary', disabled: true, onClick: this.filterOn }, 'only my polls'), _react2.default.createElement(_reactBootstrap.Button, { bsSize: 'small', bsStyle: 'success', onClick: this.filterOff }, 'all polls'));
         if (showAll) {
-          buttons = _react2.default.createElement(_reactBootstrap.ButtonToolbar, null, _react2.default.createElement(_reactBootstrap.Button, { bsSize: 'small', bsStyle: 'primary', onClick: this.filterOn }, 'only my polls'), _react2.default.createElement(_reactBootstrap.Button, { bsSize: 'small', bsStyle: 'success', disabled: true, onClick: this.filterOff }, 'all polls'));
+          buttons = _react2.default.createElement(_reactBootstrap.ButtonToolbar, { className: 'pull-right' }, _react2.default.createElement(_reactBootstrap.Button, { bsSize: 'small', bsStyle: 'primary', onClick: this.filterOn }, 'only my polls'), _react2.default.createElement(_reactBootstrap.Button, { bsSize: 'small', bsStyle: 'success', disabled: true, onClick: this.filterOff }, 'all polls'));
         }
       }
       function header(h) {
         return _react2.default.createElement('h2', { className: 'title text-danger' }, h);
       }
-      return _react2.default.createElement('div', null, _react2.default.createElement(_reactBootstrap.Jumbotron, null, _react2.default.createElement('h2', null, 'FCC - Voting App'), _react2.default.createElement('p', { className: 'lead' }, 'Below are polls hosted.', _react2.default.createElement('br', null), 'Select a poll to see the results and vote, or sign-in to make a new poll.'), buttons), _react2.default.createElement(_reactBootstrap.Accordion, null, authenticated && _react2.default.createElement(_reactBootstrap.Panel, { header: newHeading, bsStyle: 'success', eventKey: 'newPoll', key: 'newPoll', expanded: showNew }, _react2.default.createElement(_PollNew2.default, { onCreate: this.createPoll }), _react2.default.createElement('p', null, 'showNew: ', showNew + "-" + this.state.showNew)), loading ? _react2.default.createElement(_reactBootstrap.Panel, { header: _react2.default.createElement('i', { className: 'fa fa-spinner fa-4x' }) }) : items.filter(function (item) {
+      var old = _react2.default.createElement(_reactBootstrap.Jumbotron, null, _react2.default.createElement('h2', null, 'FCC - Voting App'), _react2.default.createElement('p', { className: 'lead' }, 'Below are polls hosted.', _react2.default.createElement('br', null), 'Select a poll to see the results and vote, or sign-in to make a new poll.'), buttons);
+      return _react2.default.createElement('div', null, buttons, _react2.default.createElement(_reactBootstrap.PageHeader, null, 'FreeCodeCamp - Voting App'), _react2.default.createElement('p', null, 'Select a poll to see the results and vote, or sign-in to make a new poll.'), _react2.default.createElement(_reactBootstrap.Accordion, null, authenticated && _react2.default.createElement(_reactBootstrap.Panel, { header: newHeading, bsStyle: 'success', eventKey: 'newPoll', key: 'newPoll', expanded: showNew }, _react2.default.createElement(_PollNew2.default, { onCreate: this.createPoll })), loading ? _react2.default.createElement(_reactBootstrap.Panel, { header: _react2.default.createElement('div', { className: 'text-center' }, 'Loading ', _react2.default.createElement('i', { className: 'fa fa-spinner fa-4x' }), ' Loading') }) : items.filter(function (item) {
         return !item.hide;
       }).map(function (item) {
         return _react2.default.createElement(_reactBootstrap.Panel, { header: header(item.poll.description), eventKey: 'poll' + item._id, key: 'poll' + item._id }, _react2.default.createElement(_PollDetails2.default, { poll: item.poll, votes: item.votes, id: item._id,
-          editable: authenticated && item.owner && item.owner.id == user.id, user: user,
+          authenticated: authenticated, owner: item.owner, user: user,
           onDelete: _this4.deletePoll, onVote: _this4.voteForOption(item._id) }));
       })));
     }
@@ -781,7 +815,7 @@ var PollNew = function (_React$Component) {
       var field = event.target.name;
       var poll = this.state.poll;
       if (field == 'options') {
-        poll[field] = event.target.value.split(',') // split up
+        var test = event.target.value.split('\n') // split up
         .map(function (o) {
           return o.trim();
         }) // remove leading and trailing spaces
@@ -794,6 +828,8 @@ var PollNew = function (_React$Component) {
             name: o
           };
         });
+        console.log('textarea input', test);
+        poll['options'] = test;
       } else {
         poll[field] = event.target.value;
       }
@@ -811,8 +847,7 @@ var PollNew = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      return _react2.default.createElement('div', null, _react2.default.createElement(_reactBootstrap.Form, null, _react2.default.createElement(_reactBootstrap.FormGroup, { controlId: 'newDescription' }, _react2.default.createElement(_reactBootstrap.ControlLabel, null, 'Description'), _react2.default.createElement(_reactBootstrap.FormControl, { type: 'text', name: 'description', placeholder: 'Description', onChange: this.handleChange })), _react2.default.createElement(_reactBootstrap.FormGroup, { controlId: 'newOptions' }, _react2.default.createElement(_reactBootstrap.ControlLabel, null, 'Available Options'), _react2.default.createElement(_reactBootstrap.FormControl, { type: 'text', name: 'options', placeholder: 'Multiple options seperated by coma ...', onChange: this.handleChange }))), _react2.default.createElement(_reactBootstrap.Button, { onClick: this.handleSubmit }, 'submit'));
-      var old = _react2.default.createElement('form', { className: 'col-xs-12 col-sm-offset-2 col-sm-4 row' }, _react2.default.createElement('div', { className: 'form-group' }, _react2.default.createElement('label', null, 'Description'), _react2.default.createElement('input', { type: 'text', className: 'form-control', id: 'newDescription', name: 'description', placeholder: 'Description', onChange: this.handleChange })), _react2.default.createElement('div', { className: 'form-group' }, _react2.default.createElement('label', null, 'Available Options'), _react2.default.createElement('input', { type: 'text', className: 'form-control', id: 'newOptions', name: 'options', placeholder: 'Multiple Options, seperated by coma ...', onChange: this.handleChange })), _react2.default.createElement('button', { className: 'btn btn-new btn-default', onClick: this.handleSubmit }, 'Submit'));
+      return _react2.default.createElement('div', null, _react2.default.createElement(_reactBootstrap.Form, null, _react2.default.createElement(_reactBootstrap.FormGroup, { controlId: 'newDescription' }, _react2.default.createElement(_reactBootstrap.ControlLabel, null, 'Description'), _react2.default.createElement(_reactBootstrap.FormControl, { type: 'text', name: 'description', placeholder: 'Description', onChange: this.handleChange })), _react2.default.createElement(_reactBootstrap.FormGroup, { controlId: 'newOptions' }, _react2.default.createElement(_reactBootstrap.ControlLabel, null, 'Available Options'), _react2.default.createElement(_reactBootstrap.FormControl, { componentClass: 'textarea', name: 'options', placeholder: 'one option per line ... ', rows: 5, onChange: this.handleChange }))), _react2.default.createElement(_reactBootstrap.Button, { bsStyle: 'primary', onClick: this.handleSubmit }, 'submit'));
     }
   }]);
 

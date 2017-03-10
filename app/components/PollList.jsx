@@ -1,5 +1,5 @@
 import React from 'react';
-import {Grid, Row, Col, Jumbotron, Button, ButtonToolbar, Accordion, Panel} from 'react-bootstrap';
+import {Grid, Row, Col, Jumbotron, PageHeader, Button, ButtonToolbar, Accordion, Panel} from 'react-bootstrap';
 import PollDetails from './PollDetails.jsx';
 import PollNew from './PollNew.jsx';
 
@@ -155,12 +155,12 @@ console.log('rendering pollist', loading, user);
     var newHeading = <h2><i className="fa fa-plus-circle"></i> NEW</h2>;
     var buttons;
     if(authenticated ) {
-      buttons = (<ButtonToolbar>
+      buttons = (<ButtonToolbar className="pull-right">
         <Button bsSize='small' bsStyle="primary" disabled onClick={this.filterOn}>only my polls</Button>
         <Button bsSize='small' bsStyle="success" onClick={this.filterOff}>all polls</Button>
       </ButtonToolbar>);
       if(showAll) {
-        buttons = (<ButtonToolbar>
+        buttons = (<ButtonToolbar className="pull-right">
           <Button bsSize='small' bsStyle="primary" onClick={this.filterOn}>only my polls</Button>
           <Button bsSize='small' bsStyle="success" disabled onClick={this.filterOff}>all polls</Button>
         </ButtonToolbar>);
@@ -169,25 +169,27 @@ console.log('rendering pollist', loading, user);
     function header(h) {
       return (<h2 className='title text-danger'>{h}</h2>);
     }
+    var old = (  <Jumbotron>
+        <h2>FCC - Voting App</h2>
+        <p className="lead">Below are polls hosted.<br/>
+        Select a poll to see the results and vote, or sign-in to make a new poll.</p>
+        {buttons}
+        </Jumbotron>);
     return (
       <div>
-        <Jumbotron>
-          <h2>FCC - Voting App</h2>
-          <p className="lead">Below are polls hosted.<br/>
-          Select a poll to see the results and vote, or sign-in to make a new poll.</p>
-          {buttons}
-          </Jumbotron>
+        {buttons}
+        <PageHeader>FreeCodeCamp - Voting App</PageHeader>
+        <p>Select a poll to see the results and vote, or sign-in to make a new poll.</p>
         <Accordion>
         { authenticated &&
           <Panel header={newHeading} bsStyle="success" eventKey="newPoll" key='newPoll' expanded={showNew}>
             <PollNew onCreate={this.createPoll}/>
-            <p>showNew: {showNew +"-"+this.state.showNew}</p>
           </Panel>
         }
-          { loading ? <Panel header={<i className="fa fa-spinner fa-4x"></i>} /> : items.filter(item => !item.hide).map( item =>
+          { loading ? <Panel header={<div className="text-center">Loading <i className="fa fa-spinner fa-4x"></i> Loading</div>} /> : items.filter(item => !item.hide).map( item =>
           <Panel header={header(item.poll.description)} eventKey={'poll' +item._id} key={'poll' +item._id}>
             <PollDetails poll={item.poll} votes={item.votes} id={item._id}
-              editable={authenticated && item.owner && item.owner.id == user.id} user={user}
+              authenticated={authenticated} owner={item.owner} user={user}
               onDelete={this.deletePoll} onVote={this.voteForOption(item._id)}/>
           </Panel>
           )}

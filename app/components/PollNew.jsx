@@ -19,14 +19,16 @@ class PollNew extends React.Component {
     const field = event.target.name;
     const poll = this.state.poll;
     if(field == 'options') {
-      poll[field] = event.target.value.split(',') // split up
+      var test = event.target.value.split('\n') // split up
           .map(o => o.trim()) // remove leading and trailing spaces
           .filter(o => o.length > 0) // only no null values
           .map(o => { return {   // map to right options object
               key: o.replace(/[\s\.-]/g,'_'), // handle special chars
               name: o
             };
-          })
+          });
+        console.log('textarea input', test);
+        poll['options'] = test;
     } else {
       poll[field] = event.target.value;
     }
@@ -49,24 +51,11 @@ class PollNew extends React.Component {
           </FormGroup>
           <FormGroup controlId="newOptions">
             <ControlLabel>Available Options</ControlLabel>
-            <FormControl type="text" name="options" placeholder="Multiple options seperated by coma ..." onChange={this.handleChange}/>
+            <FormControl componentClass="textarea" name="options" placeholder="one option per line ... " rows={5} onChange={this.handleChange}/>
           </FormGroup>
         </Form>
-        <Button onClick={this.handleSubmit}>submit</Button>
+        <Button bsStyle='primary' onClick={this.handleSubmit}>submit</Button>
       </div>
-    );
-    var old = (
-      <form className="col-xs-12 col-sm-offset-2 col-sm-4 row">
-         <div className="form-group">
-           <label>Description</label>
-           <input type="text" className="form-control" id="newDescription" name="description" placeholder="Description" onChange={this.handleChange}/>
-         </div>
-         <div className="form-group">
-           <label>Available Options</label>
-           <input type="text" className="form-control" id="newOptions" name="options" placeholder="Multiple Options, seperated by coma ..." onChange={this.handleChange}/>
-         </div>
-         <button className="btn btn-new btn-default" onClick={this.handleSubmit}>Submit</button>
-     </form>
     );
   }
 }

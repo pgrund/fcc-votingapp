@@ -5,7 +5,7 @@ const MyNav = ({ authenticated, onProfile, onLogin, onLogout }) => (
         <Navbar>
           <Navbar.Header>
             <Navbar.Brand>
-              <a href="#">FreeCodeCamp - Voting App</a>
+              <a href="#">FCC-Voting App</a>
             </Navbar.Brand>
             <Navbar.Toggle />
           </Navbar.Header>

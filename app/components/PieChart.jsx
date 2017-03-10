@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {Table} from 'react-bootstrap';
 import * as d3 from "d3"
 
 class PieChart extends React.Component {
@@ -16,6 +17,7 @@ class PieChart extends React.Component {
     var {votes} = this.props;
 
     svg.select('.chartLayer').remove();
+    svg.select('.tableData').remove();
 
     var data = d3.nest().key(d => d.name).entries(votes);
 
@@ -60,12 +62,24 @@ class PieChart extends React.Component {
   componentWillUnmount() {
       var el = ReactDOM.findDOMNode(this);
       d3.select(el).select('.chartLayer').remove();
+      d3.select(el).select('.tableData').remove();
   }
 
   render() {
+    const { votes, showTable } = this.props;
+    const data = d3.nest().key(function(d) {return d.name}).entries(votes);
+    var table = (
+      <Table bordered hover striped>
+        <caption className="h2">Votes for this poll</caption>
+        <tbody>{data.map((d) =>
+          <tr key={d.key}><th>{d.key}</th><td>{d.values.length}</td></tr>
+        )}
+        </tbody>
+      </Table>);
     return (
       <div id="piechart">
-      { this.props.votes.length == 0 && <p className="lead">no votes yet</p>}
+      { votes.length == 0 && <p className="lead">no votes yet</p> }
+      { showTable && table }
       </div>
     );
   }
@@ -74,11 +88,13 @@ PieChart.propTypes = {
   width: React.PropTypes.number.isRequired,
   height: React.PropTypes.number.isRequired,
   votes: React.PropTypes.array.isRequired,
+  showTable: React.PropTypes.bool
 };
 PieChart.defaultProps = {
   width: 480,
   height: 300,
-  votes: []
+  votes: [],
+  showTable: false
 };
 
 export default PieChart;
