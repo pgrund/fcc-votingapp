@@ -11,7 +11,7 @@ class PollDetails extends React.Component {
   }
   render() {
     var {owner, poll, votes, user,  id, authenticated,
-      onDelete, onEdit, onVote} = this.props;
+      onDelete, onEdit, onVote, onAddOption} = this.props;
 
     var alreadyVoted = (votes && votes.find(v => v.user == user.username));
     var editable = (owner && owner.id == user.id);
@@ -61,7 +61,7 @@ class PollDetails extends React.Component {
                         <InputGroup>
                           <FormControl type="text" onChange={(evt) => {this.setState({option: evt.target.value});}}/>
                           <InputGroup.Button>
-                            <Button bsStyle="success" onClick={() => {alert(this.state.option)}}>add option</Button>
+                            <Button bsStyle="success" onClick={(evt) => { onAddOption(id, this.state.option)}}>add option</Button>
                           </InputGroup.Button>
                         </InputGroup>
                       </FormGroup>
@@ -94,13 +94,15 @@ PollDetails.propTypes = {
   user: React.PropTypes.object.isRequired,
   onDelete: React.PropTypes.func.isRequired,
   onEdit: React.PropTypes.func.isRequired,
-  onVote: React.PropTypes.func.isRequired
+  onVote: React.PropTypes.func.isRequired,
+  onAddOption: React.PropTypes.func.isRequired
 };
 PollDetails.defaultProps = {
   authenticated: false,
   onDelete: function(id) {console.log('no function defined for deleting a poll!!', id);},
   onEdit: function(id) {console.log('no function defined for editing a poll!!', id);},
-  onVote: function(id) {console.log('no function defined for voting for an option!!', id);}
+  onVote: function(id) {console.log('no function defined for voting for an option!!', id);},
+  onAddOption: function(id, option) {console.log('no function defined for adding an option!!', id, option);}
 };
 
 export default PollDetails;

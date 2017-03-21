@@ -17,6 +17,7 @@ class PollList extends React.Component {
     this.createPoll = this.createPoll.bind(this);
     this.deletePoll = this.deletePoll.bind(this);
     this.voteForOption = this.voteForOption.bind(this);
+    this.addOption = this.addOption.bind(this);
   }
 
   componentDidMount() {
@@ -64,6 +65,33 @@ class PollList extends React.Component {
     });
   }
 
+  addOption(pollId, option) {
+    var _this = this;
+    console.log('add option for poll', pollId, option);
+    this.setState({loading: true});
+    fetch(`/polls/${pollId}/options`, {
+          method: 'POST',
+          headers: {
+             'Content-Type': 'text/plain'
+          },
+          credentials: 'include',
+          body: option
+      }).then(function(response) {
+        if(response.ok) {
+          return response.json();
+        } else {
+          throw new Error(response.statusText);
+        }
+      }).then(function(item) {
+        var myItems = _this.state.items.filter(i => i._id != item._id).concat(item);
+        console.log('added option result', item, myItems);
+        _this.setState({
+          items: myItems,
+          loading: false
+        });
+        console.log('done adding option');
+      });
+  }
   createPoll(newPoll) {
     var _this = this;
     console.log('create new Poll', newPoll);
@@ -190,7 +218,8 @@ console.log('rendering pollist', loading, user);
           <Panel header={header(item.poll.description)} eventKey={'poll' +item._id} key={'poll' +item._id}>
             <PollDetails poll={item.poll} votes={item.votes} id={item._id}
               authenticated={authenticated} owner={item.owner} user={user}
-              onDelete={this.deletePoll} onVote={this.voteForOption(item._id)}/>
+              onDelete={this.deletePoll} onVote={this.voteForOption(item._id)}
+              onAddOption={this.addOption}/>
           </Panel>
           )}
         </Accordion>

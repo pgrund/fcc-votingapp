@@ -89,6 +89,30 @@ function PollHandler () {
 			);
 	};
 
+  this.addOption = function(req, res) {
+    console.log('adding option to existing poll');
+    var  id = req.params.id,
+          o = req.body;
+     Polls
+ 			.findById(id)
+       .catch(errorHandling)
+       .then(result => {
+           //console.log('found!', o, JSON.stringify(result.poll.options, null, ' '));
+           var option = {   // map to right options object
+               key: o.replace(/[\s\.-]/g,'_'), // handle special chars
+               name: o
+             };
+           result.poll.options.push(option);
+           result.markModified('poll');
+           result.save()
+             .catch(errorHandling)
+             .then( (result) => {
+               res.json(result);
+             });
+ 				}
+ 			);
+  };
+
 	this.createPoll = function (req, res) {
 		console.log('create a new poll', req.body, req.user);
     var poll = new Polls({

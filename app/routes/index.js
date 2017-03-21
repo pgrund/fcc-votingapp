@@ -79,6 +79,12 @@ module.exports = function (app, passport) {
       .post(isLoggedIn, pollHandler.updatePoll)
       .delete(isLoggedIn, pollHandler.deletePoll);
 
+	app.route('/polls/:id/options')
+		      .post(function(req,res,next) {
+		          console.log('adding option', req.params.id, req.body);
+		          next();
+		        },pollHandler.addOption);
+
   app.route('/polls/:id/options/:oid')
       .post(function(req,res,next) {
           console.log('voting', req.user);

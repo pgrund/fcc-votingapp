@@ -7,7 +7,6 @@ var passport = require('passport');
 var session = require('express-session');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
-// var requestIp = require('request-ip');
 
 var app = express();
 require('dotenv').load();
@@ -27,6 +26,7 @@ app.use('/common', express.static(process.cwd() + '/app/common'));
 app.use(bodyParser.urlencoded());
 // parse application/json
 app.use(bodyParser.json());
+app.use(bodyParser.text());
 app.use(cookieParser());
 
 app.use(session({

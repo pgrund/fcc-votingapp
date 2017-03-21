@@ -17,7 +17,8 @@ class VoteApp extends React.Component {
       show: {
         login: false,
         profile: false
-      }
+      },
+      single: props.single
     };
     this.loginHandler = this.loginHandler.bind(this);
     this.logoutHandler = this.logoutHandler.bind(this);
@@ -74,7 +75,7 @@ class VoteApp extends React.Component {
           onProfile={() => {this.setState({show : {profile: true}});}}
           onLogout={this.logoutHandler}/>
         <PollList authenticated={authenticated} user={user}
-          handleAnonymousUser={this.setAnonymousUser}/>
+          handleAnonymousUser={this.setAnonymousUser} selected={this.state.single}/>
         <LoginForm user={user} errors={errors}
           handleClose={() => {this.setState({show : {login: false}});}}
           visible={this.state.show.login}
