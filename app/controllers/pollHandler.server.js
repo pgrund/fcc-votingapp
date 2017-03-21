@@ -40,13 +40,9 @@ function PollHandler () {
   this.getSinglePoll = function (req, res) {
     // all polls
     console.log('single poll ...');
-		Polls
+		return Polls
 			.find({_id: req.params.id})
-      .select('poll votes')
-      .catch(errorHandling)
-      .then(result =>  {
-        res.json(result);
-			});
+      .catch(errorHandling);
 	};
 
 	this.vote = function (req, res) {

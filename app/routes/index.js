@@ -75,7 +75,16 @@ module.exports = function (app, passport) {
       .post(isLoggedIn, pollHandler.createPoll);
 
   app.route('/polls/:id')
-      .get(pollHandler.getSinglePoll)
+      .get(function(req,res) {
+				pollHandler.getSinglePoll(req, res).then( function(result) {
+					var user = req.user ? req.user : {
+						id: req.ip.replace(/\.|\s|:|\\|\//g, '_'),
+						username: `user-${req.ip}`,
+						displayName: `anonymous from ${req.ip}`
+					};
+					res.json({ polls: result, user: user});
+				});
+			})
       .post(isLoggedIn, pollHandler.updatePoll)
       .delete(isLoggedIn, pollHandler.deletePoll);
 

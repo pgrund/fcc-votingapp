@@ -5,13 +5,13 @@ const MyNav = ({ authenticated, onProfile, onLogin, onLogout }) => (
         <Navbar>
           <Navbar.Header>
             <Navbar.Brand>
-              <a href="#">FCC-Voting App</a>
+              <a href="/">FCC-Voting App</a>
             </Navbar.Brand>
             <Navbar.Toggle />
           </Navbar.Header>
           <Navbar.Collapse>
             <Nav>
-              <NavItem eventKey='nav1' href="#">Home</NavItem>
+              <NavItem eventKey='nav1' href="/">Home</NavItem>
               { authenticated && <NavItem eventKey='nav3' href="#" onClick={onProfile}>Profile</NavItem> }
             </Nav>
             <Nav pullRight>

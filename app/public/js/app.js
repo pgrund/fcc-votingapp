@@ -140,7 +140,7 @@ var MyNav = function MyNav(_ref) {
       onProfile = _ref.onProfile,
       onLogin = _ref.onLogin,
       onLogout = _ref.onLogout;
-  return _react2.default.createElement(_reactBootstrap.Navbar, null, _react2.default.createElement(_reactBootstrap.Navbar.Header, null, _react2.default.createElement(_reactBootstrap.Navbar.Brand, null, _react2.default.createElement('a', { href: '#' }, 'FCC-Voting App')), _react2.default.createElement(_reactBootstrap.Navbar.Toggle, null)), _react2.default.createElement(_reactBootstrap.Navbar.Collapse, null, _react2.default.createElement(_reactBootstrap.Nav, null, _react2.default.createElement(_reactBootstrap.NavItem, { eventKey: 'nav1', href: '#' }, 'Home'), authenticated && _react2.default.createElement(_reactBootstrap.NavItem, { eventKey: 'nav3', href: '#', onClick: onProfile }, 'Profile')), _react2.default.createElement(_reactBootstrap.Nav, { pullRight: true }, authenticated ? _react2.default.createElement(_reactBootstrap.NavItem, { eventKey: 'nav4', href: '/logout', onClick: onLogout }, 'Logout') : _react2.default.createElement(_reactBootstrap.NavItem, { eventKey: 'nav2', href: '#', onClick: onLogin }, 'Login'))));
+  return _react2.default.createElement(_reactBootstrap.Navbar, null, _react2.default.createElement(_reactBootstrap.Navbar.Header, null, _react2.default.createElement(_reactBootstrap.Navbar.Brand, null, _react2.default.createElement('a', { href: '/' }, 'FCC-Voting App')), _react2.default.createElement(_reactBootstrap.Navbar.Toggle, null)), _react2.default.createElement(_reactBootstrap.Navbar.Collapse, null, _react2.default.createElement(_reactBootstrap.Nav, null, _react2.default.createElement(_reactBootstrap.NavItem, { eventKey: 'nav1', href: '/' }, 'Home'), authenticated && _react2.default.createElement(_reactBootstrap.NavItem, { eventKey: 'nav3', href: '#', onClick: onProfile }, 'Profile')), _react2.default.createElement(_reactBootstrap.Nav, { pullRight: true }, authenticated ? _react2.default.createElement(_reactBootstrap.NavItem, { eventKey: 'nav4', href: '/logout', onClick: onLogout }, 'Logout') : _react2.default.createElement(_reactBootstrap.NavItem, { eventKey: 'nav2', href: '#', onClick: onLogin }, 'Login'))));
 };
 
 MyNav.propTypes = {
@@ -431,9 +431,7 @@ var PollDetails = function (_React$Component) {
           onDelete(id);
         } }, _react2.default.createElement('i', { className: 'fa fa-trash' }), ' delete'), _react2.default.createElement(_reactBootstrap.Button, { bsStyle: 'warning', onClick: function onClick() {
           onEdit(id);
-        } }, _react2.default.createElement('i', { className: 'fa fa-pencil' }), ' edit')), authenticated && _react2.default.createElement(_reactBootstrap.ButtonGroup, { className: 'pull-right' }, _react2.default.createElement(_reactBootstrap.Button, { bsStyle: 'primary', onClick: function onClick() {
-          console.log('share', '/polls/' + id);
-        } }, _react2.default.createElement('i', { className: 'fa fa-mail' }), ' share poll'))), _react2.default.createElement('h2', { className: 'title' }, poll.description)), _react2.default.createElement(_reactBootstrap.Col, { xs: 12, smOffset: 2, sm: 10 }, _react2.default.createElement(_reactBootstrap.Row, null, _react2.default.createElement(_reactBootstrap.Col, { xs: 12 }, _react2.default.createElement('p', null, alreadyVoted ? 'I voted for ...' : 'I\'d like to vote for ...'), authenticated && _react2.default.createElement(_reactBootstrap.FormGroup, { className: 'pull-right' }, _react2.default.createElement(_reactBootstrap.InputGroup, null, _react2.default.createElement(_reactBootstrap.FormControl, { type: 'text', onChange: function onChange(evt) {
+        } }, _react2.default.createElement('i', { className: 'fa fa-pencil' }), ' edit')), authenticated && _react2.default.createElement(_reactBootstrap.ButtonGroup, { className: 'pull-right' }, _react2.default.createElement(_reactBootstrap.Button, { bsStyle: 'primary', href: 'mailto:?subject=check my vote&body=Hi,\ncheck out this awesome vote at ' + window.location.href.split('?')[0] + '?select=' + id }, _react2.default.createElement('i', { className: 'fa fa-mail' }), ' share poll'))), _react2.default.createElement('h2', { className: 'title' }, poll.description)), _react2.default.createElement(_reactBootstrap.Col, { xs: 12, smOffset: 2, sm: 10 }, _react2.default.createElement(_reactBootstrap.Row, null, _react2.default.createElement(_reactBootstrap.Col, { xs: 12 }, _react2.default.createElement('p', null, alreadyVoted ? 'I voted for ...' : 'I\'d like to vote for ...'), authenticated && _react2.default.createElement(_reactBootstrap.FormGroup, { className: 'pull-right' }, _react2.default.createElement(_reactBootstrap.InputGroup, null, _react2.default.createElement(_reactBootstrap.FormControl, { type: 'text', onChange: function onChange(evt) {
           _this2.setState({ option: evt.target.value });
         } }), _react2.default.createElement(_reactBootstrap.InputGroup.Button, null, _react2.default.createElement(_reactBootstrap.Button, { bsStyle: 'success', onClick: function onClick(evt) {
           onAddOption(id, _this2.state.option);
@@ -558,7 +556,12 @@ var PollList = function (_React$Component) {
     key: 'componentDidMount',
     value: function componentDidMount() {
       var _this = this;
-      fetch('/polls', {
+      var url = "/polls";
+      if (this.props.selected) {
+        console.log('selected', this.props.selected);
+        url = '/polls/' + this.props.selected;
+      };
+      fetch(url, {
         method: 'GET',
         mode: 'cors',
         headers: new Headers({
@@ -566,10 +569,15 @@ var PollList = function (_React$Component) {
         }),
         credentials: 'same-origin'
       }).then(function (response) {
-        return response.json();
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error(response.statusText);
+        }
       }).then(function (json) {
+        console.log('state set', json);
         _this.setState({
-          items: json.polls,
+          items: [].concat(json.polls),
           showAll: true,
           loading: false
         });
@@ -665,7 +673,7 @@ var PollList = function (_React$Component) {
           showNew: false,
           loading: false
         });
-        // console.log('state set');
+        //console.log('state set');
       });
     }
   }, {
@@ -742,7 +750,7 @@ var PollList = function (_React$Component) {
           authenticated = _props.authenticated,
           user = _props.user;
 
-      console.log('rendering pollist', loading, user);
+      console.log('rendering pollist', loading, user, items);
       var newHeading = _react2.default.createElement('h2', null, _react2.default.createElement('i', { className: 'fa fa-plus-circle' }), ' NEW');
       var buttons;
       if (authenticated) {
@@ -1007,15 +1015,6 @@ var VoteApp = function (_React$Component) {
 
     var _this2 = _possibleConstructorReturn(this, (VoteApp.__proto__ || Object.getPrototypeOf(VoteApp)).call(this, props));
 
-    var qd = {};
-    window.location.search.substr(1).split("&").forEach(function (item) {
-      var s = item.split("="),
-          k = s[0],
-          v = s[1] && decodeURIComponent(s[1]);
-      //(k in qd) ? qd[k].push(v) : qd[k] = [v]
-      (qd[k] = qd[k] || []).push(v); //short-circuit
-    });
-
     _this2.state = {
       authenticated: false,
       user: {},
@@ -1024,7 +1023,7 @@ var VoteApp = function (_React$Component) {
         login: false,
         profile: false
       },
-      single: qd.single
+      single: props.single ? props.single.split('=')[1] : ''
     };
     _this2.loginHandler = _this2.loginHandler.bind(_this2);
     _this2.logoutHandler = _this2.logoutHandler.bind(_this2);
@@ -1086,7 +1085,7 @@ var VoteApp = function (_React$Component) {
           user = _state.user,
           errors = _state.errors;
 
-      return _react2.default.createElement(_reactBootstrap.Grid, { fluid: true }, _react2.default.createElement('h2', null, this.state.single), _react2.default.createElement(_MyNav2.default, { authenticated: authenticated, user: user,
+      return _react2.default.createElement(_reactBootstrap.Grid, { fluid: true }, _react2.default.createElement(_MyNav2.default, { authenticated: authenticated, user: user,
         onLogin: function onLogin() {
           _this3.setState({ show: { login: true } });
         },
@@ -1094,7 +1093,7 @@ var VoteApp = function (_React$Component) {
           _this3.setState({ show: { profile: true } });
         },
         onLogout: this.logoutHandler }), _react2.default.createElement(_PollList2.default, { authenticated: authenticated, user: user,
-        handleAnonymousUser: this.setAnonymousUser }), _react2.default.createElement(_LoginForm2.default, { user: user, errors: errors,
+        handleAnonymousUser: this.setAnonymousUser, selected: this.state.single }), _react2.default.createElement(_LoginForm2.default, { user: user, errors: errors,
         handleClose: function handleClose() {
           _this3.setState({ show: { login: false } });
         },
@@ -1109,7 +1108,7 @@ var VoteApp = function (_React$Component) {
   return VoteApp;
 }(_react2.default.Component);
 
-_reactDom2.default.render(_react2.default.createElement(VoteApp, null), document.getElementById('app'));
+_reactDom2.default.render(_react2.default.createElement(VoteApp, { single: window.location.search.substring(1) }), document.getElementById('app'));
 
 },{"./LoginForm.jsx":1,"./MyNav.jsx":2,"./PollList.jsx":5,"./ProfileForm.jsx":7,"react":449,"react-bootstrap":242,"react-dom":253}],9:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/array/from"), __esModule: true };

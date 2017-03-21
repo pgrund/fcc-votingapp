@@ -18,7 +18,7 @@ class VoteApp extends React.Component {
         login: false,
         profile: false
       },
-      single: props.single
+      single: props.single ? props.single.split('=')[1] : ''
     };
     this.loginHandler = this.loginHandler.bind(this);
     this.logoutHandler = this.logoutHandler.bind(this);
@@ -88,6 +88,6 @@ class VoteApp extends React.Component {
 }
 
 ReactDOM.render(
-  <VoteApp />,
+  <VoteApp single={window.location.search.substring(1)}/>,
   document.getElementById('app')
 );

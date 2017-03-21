@@ -46,7 +46,7 @@ class PollDetails extends React.Component {
                     }
                     { authenticated &&
                       <ButtonGroup className="pull-right">
-                        <Button bsStyle="primary" onClick={() => {console.log('share', `/polls/${id}`)}}><i className="fa fa-mail"></i> share poll</Button>
+                        <Button bsStyle="primary" href={`mailto:?subject=check this vote&body=Hi,\ncheck out this awesome vote at ${window.location.href.split('?')[0]}?select=${id}`}><i className="fa fa-mail"></i> share poll</Button>
                       </ButtonGroup>
                     }
                   </ButtonToolbar>

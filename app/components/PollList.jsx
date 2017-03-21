@@ -22,7 +22,12 @@ class PollList extends React.Component {
 
   componentDidMount() {
     var _this = this;
-    fetch('/polls', {
+    var url = "/polls";
+    if(this.props.selected) {
+      console.log('selected', this.props.selected);
+      url = `/polls/${this.props.selected}`;
+    };
+    fetch(url, {
       method: 'GET',
 	    mode: 'cors',
 	    headers: new Headers({
@@ -30,17 +35,22 @@ class PollList extends React.Component {
         }),
       credentials: 'same-origin'
     }).then(function(response) {
+      if(response.ok) {
         return response.json();
-    })
-     .then(function(json) {
+      } else {
+        throw new Error(response.statusText);
+      }
+    }).then(function(json) {
+       console.log('state set', json);
        _this.setState({
-         items: json.polls,
+         items: [].concat(json.polls),
          showAll: true,
          loading: false
        });
        if(!_this.authenticated) {
          _this.props.handleAnonymousUser(json.user);
        }
+
      });
   }
 
@@ -120,7 +130,7 @@ class PollList extends React.Component {
           showNew: false,
           loading: false
         });
-        // console.log('state set');
+       //console.log('state set');
       })
   }
 
@@ -179,7 +189,7 @@ class PollList extends React.Component {
     var {items, showAll, showNew, loading} = this.state;
     var {authenticated, user} = this.props;
 
-console.log('rendering pollist', loading, user);
+console.log('rendering pollist', loading, user, items);
     var newHeading = <h2><i className="fa fa-plus-circle"></i> NEW</h2>;
     var buttons;
     if(authenticated ) {
