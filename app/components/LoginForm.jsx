@@ -39,12 +39,6 @@ class LoginForm extends React.Component {
               <Button className="btn-gh" onClick={handleAuthByGithub}>
                 <i className="fa fa-github"></i> Github
               </Button>
-              <Button className="btn-fb" onClick={handleAuthByFacebook}>
-                <i className="fa fa-facebook"></i> Facebook
-              </Button>
-              <Button className="btn-tw" onClick={handleAuthByTwitter}>
-                <i className="fa fa-twitter"></i> Twitter
-              </Button>
             </ButtonToolbar>
             <p>or</p>
             <Form>

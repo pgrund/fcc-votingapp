@@ -18,6 +18,11 @@ module.exports = function (app, passport) {
 
   var pollHandler = new PollHandler();
 
+	app.use(function(req, res, next) {
+	  res.header("Access-Control-Allow-Origin", "*");
+	  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	  next();
+	});
 	app.route('/')
 		.get(function (req, res) {
 			 res.sendFile(path + '/app/public/index.html');
@@ -57,9 +62,14 @@ module.exports = function (app, passport) {
 
 	app.route('/auth/github/callback')
 		.get(passport.authenticate('github', {
-			successRedirect: '/',
+			//successRedirect: '/',
 			failureRedirect: '/login'
-		}));
+		}),
+		function(req,res,next) {
+			console.log('github auth done');
+			req.session.user = req.user;
+            res.json(req.user);
+		});
 
 	app.route('/polls')
       .get(function(req, res){

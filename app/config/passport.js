@@ -32,7 +32,7 @@ module.exports = function (passport) {
 					return done(err);
 				}
 
-				if (user) {
+				if (poll) {
 					return done(null, poll.owner);
 				} else {
 					var newEntry = {

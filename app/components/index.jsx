@@ -21,6 +21,7 @@ class VoteApp extends React.Component {
       single: props.single ? props.single.split('=')[1] : ''
     };
     this.loginHandler = this.loginHandler.bind(this);
+    this.loginGithubHandler = this.loginGithubHandler.bind(this);
     this.logoutHandler = this.logoutHandler.bind(this);
     this.setAnonymousUser = this.setAnonymousUser.bind(this);
   }
@@ -30,6 +31,31 @@ class VoteApp extends React.Component {
       console.log('setting anonymous user', user);
       this.setState({user: user});
     }
+  }
+  loginGithubHandler( user ) {
+    const _this = this;
+    fetch(`/auth/github`, {
+          method: 'GET',
+          mode: 'no-cors',
+          credentials: 'same-origin'
+      }).then(function(response) {
+        if(response.ok) {
+          const js = response.json();
+          console.log(js);
+          return js;
+        } else {
+          throw new Error(response.statusText);
+        }
+      }).then(function(loggedInUser){
+        console.log('auth successfull', loggedInUser);
+        _this.setState({
+          authenticated: true,
+          user: loggedInUser,
+          show: {
+            login: false
+          }
+        });
+      })
   }
   loginHandler( user ) {
     const _this = this;
@@ -79,7 +105,8 @@ class VoteApp extends React.Component {
         <LoginForm user={user} errors={errors}
           handleClose={() => {this.setState({show : {login: false}});}}
           visible={this.state.show.login}
-          handleAuthByLocal={this.loginHandler}/>
+          handleAuthByLocal={this.loginHandler}
+          handleAuthByGithub={this.loginGithubHandler}/>
         {authenticated && <ProfileForm user={user} visible={this.state.show.profile}
           handleClose={() => {this.setState({show: {profile: false}})}}/> }
       </Grid>
