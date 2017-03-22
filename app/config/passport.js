@@ -33,8 +33,10 @@ module.exports = function (passport) {
 				}
 
 				if (poll) {
+				  console.log('found user as owner of polls');
 					return done(null, poll.owner);
 				} else {
+				  console.log('no poll yet created');
 					var newEntry = {
             id : profile.id,
             username : profile.username,

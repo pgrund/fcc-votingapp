@@ -64,12 +64,13 @@ module.exports = function (app, passport) {
 		.get(passport.authenticate('github', {
 			//successRedirect: '/',
 			failureRedirect: '/login'
-		}),
-		function(req,res,next) {
-			console.log('github auth done');
-			req.session.user = req.user;
-            res.json(req.user);
-		});
+			}),
+			function(req,res,next) {
+				console.log('github auth done, register user', req.user);
+				req.session.user = req.user;
+	            res.json(req.user);
+			}
+		);
 
 	app.route('/polls')
       .get(function(req, res){

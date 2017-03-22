@@ -82,7 +82,7 @@ var LoginForm = function (_React$Component) {
           handleAuthByTwitter = _props.handleAuthByTwitter,
           handleAuthByLocal = _props.handleAuthByLocal;
 
-      return _react2.default.createElement(_reactBootstrap.Modal, { show: visible, onHide: handleClose }, _react2.default.createElement(_reactBootstrap.Modal.Header, { closeButton: true }, _react2.default.createElement(_reactBootstrap.Modal.Title, null, 'Login via ...')), _react2.default.createElement(_reactBootstrap.Modal.Body, null, _react2.default.createElement(_reactBootstrap.ButtonToolbar, null, _react2.default.createElement(_reactBootstrap.Button, { className: 'btn-gh', onClick: handleAuthByGithub }, _react2.default.createElement('i', { className: 'fa fa-github' }), ' Github')), _react2.default.createElement('p', null, 'or'), _react2.default.createElement(_reactBootstrap.Form, null, _react2.default.createElement(_reactBootstrap.FormGroup, { controlId: 'formInlineName' }, _react2.default.createElement(_reactBootstrap.ControlLabel, null, 'User Name'), _react2.default.createElement(_reactBootstrap.FormControl, { type: 'text', name: 'username', placeholder: 'User Name', onChange: this.handleChange })), _react2.default.createElement(_reactBootstrap.FormGroup, { controlId: 'formInlinePassword' }, _react2.default.createElement(_reactBootstrap.ControlLabel, null, 'Password'), _react2.default.createElement(_reactBootstrap.FormControl, { type: 'password', name: 'password', placeholder: 'your pass ...', onChange: this.handleChange })))), _react2.default.createElement(_reactBootstrap.Modal.Footer, null, _react2.default.createElement(_reactBootstrap.Button, { bsStyle: 'primary', onClick: function onClick() {
+      return _react2.default.createElement(_reactBootstrap.Modal, { show: visible, onHide: handleClose }, _react2.default.createElement(_reactBootstrap.Modal.Header, { closeButton: true }, _react2.default.createElement(_reactBootstrap.Modal.Title, null, 'Login via ...')), _react2.default.createElement(_reactBootstrap.Modal.Body, null, _react2.default.createElement(_reactBootstrap.ButtonToolbar, null, _react2.default.createElement(_reactBootstrap.Button, { className: 'btn-gh', href: '/auth/github' }, _react2.default.createElement('i', { className: 'fa fa-github' }), ' Github')), _react2.default.createElement('p', null, 'or'), _react2.default.createElement(_reactBootstrap.Form, null, _react2.default.createElement(_reactBootstrap.FormGroup, { controlId: 'formInlineName' }, _react2.default.createElement(_reactBootstrap.ControlLabel, null, 'User Name'), _react2.default.createElement(_reactBootstrap.FormControl, { type: 'text', name: 'username', placeholder: 'User Name', onChange: this.handleChange })), _react2.default.createElement(_reactBootstrap.FormGroup, { controlId: 'formInlinePassword' }, _react2.default.createElement(_reactBootstrap.ControlLabel, null, 'Password'), _react2.default.createElement(_reactBootstrap.FormControl, { type: 'password', name: 'password', placeholder: 'your pass ...', onChange: this.handleChange })))), _react2.default.createElement(_reactBootstrap.Modal.Footer, null, _react2.default.createElement(_reactBootstrap.Button, { bsStyle: 'primary', onClick: function onClick() {
           return handleAuthByLocal(_this2.state.user);
         } }, 'Login'), _react2.default.createElement(_reactBootstrap.Button, { onClick: handleClose }, 'Close')));
     }
@@ -416,9 +416,6 @@ var PollDetails = function (_React$Component) {
         var option = votes.filter(function (v) {
           return v.option == o._id;
         });
-        if (o.name == 'e') {
-          console.log('option testing', o, option, user);
-        }
         var btn = _react2.default.createElement(_reactBootstrap.Button, { bsStyle: 'primary', onClick: function onClick() {
             onVote(o._id);
           } }, o.name);
@@ -1042,29 +1039,32 @@ var VoteApp = function (_React$Component) {
     }
   }, {
     key: 'loginGithubHandler',
-    value: function loginGithubHandler(user) {
+    value: function loginGithubHandler() {
       var _this = this;
+      console.log('starting github handler');
       fetch('/auth/github', {
         method: 'GET',
         mode: 'no-cors',
+        redirect: 'error',
         credentials: 'same-origin'
       }).then(function (response) {
-        if (response.ok) {
-          var js = response.json();
-          console.log(js);
-          return js;
-        } else {
-          throw new Error(response.statusText);
-        }
-      }).then(function (loggedInUser) {
-        console.log('auth successfull', loggedInUser);
-        _this.setState({
-          authenticated: true,
-          user: loggedInUser,
-          show: {
-            login: false
+        alert('feedback from /auth/github' + JSON.stringify(response, null, ' '));
+        /*  if(response.ok) {
+            const result = response.json();
+            console.log('got back from github auth', result);
+            return result;
+          } else {
+            throw new Error(response.statusText);
           }
-        });
+        }).then(function(loggedInUser){
+          console.log('auth successfull', loggedInUser);
+          _this.setState({
+            authenticated: true,
+            user: loggedInUser,
+            show: {
+              login: false
+            }
+          });*/
       });
     }
   }, {

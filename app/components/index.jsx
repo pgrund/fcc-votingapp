@@ -32,17 +32,20 @@ class VoteApp extends React.Component {
       this.setState({user: user});
     }
   }
-  loginGithubHandler( user ) {
+  loginGithubHandler() {
     const _this = this;
+    console.log('starting github handler');
     fetch(`/auth/github`, {
           method: 'GET',
           mode: 'no-cors',
+          redirect: 'error',
           credentials: 'same-origin'
       }).then(function(response) {
-        if(response.ok) {
-          const js = response.json();
-          console.log(js);
-          return js;
+        alert('feedback from /auth/github' + JSON.stringify(response, null, ' '));
+      /*  if(response.ok) {
+          const result = response.json();
+          console.log('got back from github auth', result);
+          return result;
         } else {
           throw new Error(response.statusText);
         }
@@ -54,7 +57,7 @@ class VoteApp extends React.Component {
           show: {
             login: false
           }
-        });
+        });*/
       })
   }
   loginHandler( user ) {

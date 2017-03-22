@@ -18,9 +18,6 @@ class PollDetails extends React.Component {
 
     function optionButton(o, idx) {
       var option = votes.filter(v => v.option == o._id);
-      if(o.name=='e') {
-        console.log('option testing', o, option, user);
-      }
       var btn = <Button bsStyle='primary' onClick={() => {onVote(o._id)}}>{o.name}</Button>;
       if(alreadyVoted) {
         btn = <Button bsStyle='default' disabled className={alreadyVoted.option == o._id  ? ' focus' : ''}>{o.name}</Button>;
