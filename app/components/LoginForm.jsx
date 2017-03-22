@@ -36,7 +36,7 @@ class LoginForm extends React.Component {
           </Modal.Header>
           <Modal.Body>
             <ButtonToolbar>
-              <Button className="btn-gh" onClick={handleAuthByGithub}>
+              <Button className="btn-gh" href="/auth/github">
                 <i className="fa fa-github"></i> Github
               </Button>
               <Button className="btn-fb" onClick={handleAuthByFacebook}>
