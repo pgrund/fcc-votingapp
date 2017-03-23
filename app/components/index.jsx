@@ -18,7 +18,7 @@ class VoteApp extends React.Component {
         login: false,
         profile: false
       },
-      single: props.single ? props.single.split('=')[1] : ''
+      single: props.single ? (props.single.split('=')[0] == 'selected' ? props.single.split('=')[1] : '') : ''
     };
     this.loginHandler = this.loginHandler.bind(this);
     this.loginGithubHandler = this.loginGithubHandler.bind(this);
@@ -29,7 +29,10 @@ class VoteApp extends React.Component {
   setAnonymousUser(user) {
     if(!this.state.authenticated) {
       console.log('setting anonymous user', user);
-      this.setState({user: user});
+      this.setState({
+        user: user,
+        authenticated: user.hasOwnProperty('auth')
+      });
     }
   }
   loginGithubHandler() {
@@ -37,18 +40,14 @@ class VoteApp extends React.Component {
     console.log('starting github handler');
     fetch(`/auth/github`, {
           method: 'GET',
-          mode: 'no-cors',
-          redirect: 'error',
-          credentials: 'same-origin'
+//mode: 'no-cors',
+          credentials: 'same-origin',
+          headers: {
+            'Origin': 'fcc-votingapp-pgrund.c9users.io'
+          }
       }).then(function(response) {
-        alert('feedback from /auth/github' + JSON.stringify(response, null, ' '));
-      /*  if(response.ok) {
-          const result = response.json();
-          console.log('got back from github auth', result);
-          return result;
-        } else {
-          throw new Error(response.statusText);
-        }
+        console.log('back from /auth/github',response);
+        return response.text();
       }).then(function(loggedInUser){
         console.log('auth successfull', loggedInUser);
         _this.setState({
@@ -57,8 +56,10 @@ class VoteApp extends React.Component {
           show: {
             login: false
           }
-        });*/
-      })
+        });
+      }).catch(function(err) {
+        console.error('error during fetch', err);
+      });
   }
   loginHandler( user ) {
     const _this = this;
@@ -87,11 +88,16 @@ class VoteApp extends React.Component {
   }
 
   logoutHandler(){
-    this.setState({
-      authenticated: false,
-      user: {}
+    fetch('auth', {
+      method: 'DELETE'
+    }).then(function(response) {
+      console.log('logged out',response);
+      this.setState({
+        authenticated: false,
+        user: {}
+      });
+      console.log('logged out');
     });
-    console.log('logged out');
   }
 
 

@@ -25,13 +25,10 @@ module.exports = function (app, passport) {
 	});
 	app.route('/')
 		.get(function (req, res) {
+			
 			 res.sendFile(path + '/app/public/index.html');
 		});
 
-	app.route('/login')
-		.get(function (req, res) {
-      res.sendFile(path + '/public/login.html');
-		});
 
 	app.route('/logout')
 		.get(function (req, res) {
@@ -47,30 +44,40 @@ module.exports = function (app, passport) {
   		});
 
   app.route('/auth/local')
-      .post(passport.authenticate('local', {
+    	.post(
+    		passport.authenticate('local', {
                failureRedirect: '/login',
               //  successReturnToOrRedirect : (req.session.returnTo ? req.session.returnTo : '/')
-            }
-            ), function(req, res, next) {
+            }), 
+            function(req, res, next) {
               req.session.user = req.user;
               res.json(req.user);
-          });
+            }
+         );
 
 
 	app.route('/auth/github')
-		.get(passport.authenticate('github'));
+		.get(
+			passport.authenticate('github')
+		);
 
 	app.route('/auth/github/callback')
-		.get(passport.authenticate('github', {
-			//successRedirect: '/',
-			failureRedirect: '/login'
+		.get(
+			passport.authenticate('github', {
+				//successRedirect: '/',
+				failureRedirect: '/login'
 			}),
-			function(req,res,next) {
+			function(req,res) {
 				console.log('github auth done, register user', req.user);
 				req.session.user = req.user;
-	            res.json(req.user);
+	            res.redirect('/');
 			}
 		);
+   app.delete('/auth', function(req, res) {
+        req.logout();
+        res.writeHead(200);
+        res.end();
+    });
 
 	app.route('/polls')
       .get(function(req, res){
